@@ -1,9 +1,11 @@
+from decimal import Decimal
+
 def seperate_exponent(value,precision=1):
-    if value >= 0.:
+    if value >= 0:
         sign = 1
     else:
         sign = -1
-    value=abs(value)
+    value=value*sign
     form1 = '%.*g' % (precision, value)
     if not form1.find('e') == -1:
         form2 = form1.split('e')
@@ -28,8 +30,12 @@ class ArgumentError():
 
 class figure(object):
     def __init__(self, argvs):
-        if isinstance(argvs, (float,int,str)):
-            self.value = float(argvs)
+        if type(argvs) in (float,int,str):
+            self.value = Decimal(repr(argvs))
+            self.lowerr = 0
+            self.uperr = 0
+        elif type(argvs) is Decimal:
+            self.value = argvs
             self.lowerr = 0
             self.uperr = 0
         elif isinstance(argvs, (list, tuple)):
@@ -240,16 +246,16 @@ def shortform(value, NumSigDigit=None):
             res[key]=shortform(value[key])
         return res
     elif isinstance(value,tuple):
-        if len(value) == 3 and all([isinstance(value[i],(float, int)) for i in range(3)]):
+        if len(value) == 3 and all([type(v) in (float, int, Decimal) for v in value]):
             return str(figure(value))
-        elif len(value) == 2 and all([isinstance(value[0],(float, int)),isinstance(value[1],(float, int))]):
+        elif len(value) == 2 and all([type(v) in (float, int, Decimal) for v in value]):
             return str(figure(value))
         else:
             res=[]
             for eachone in value:
                 res.append(shortform(eachone))
             return tuple(res)
-    elif isinstance(value, (float,int)):
+    elif isinstance(value, (float,int,Decimal)):
         if NumSigDigit == None or not isinstance(NumSigDigit, int):
             form1 = '%.3g' % (value)
             if not form1.find('e') == -1:

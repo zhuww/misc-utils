@@ -34,6 +34,12 @@ class deluxetable:
         self.commentslines = ''
         cols=''
         abc = self.alphabet()
+        while not Caption.find('#') == -1:
+            i = Caption.find('#')
+            if Caption[i-1] == '\\':
+                Captioni = Caption.replace('#',r'@TexTableSpecialMarker@', 1)
+                continue
+            Caption = Caption.replace('#',r'\tablenotemark{%s}' % abc.next(), 1)
         for name in colnames:
             while not name.find('#') == -1:
                 i = name.find('#')
