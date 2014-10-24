@@ -1,11 +1,9 @@
-from decimal import Decimal
-
 def seperate_exponent(value,precision=1):
-    if value >= 0:
+    if value >= 0.:
         sign = 1
     else:
         sign = -1
-    value=value*sign
+    value=abs(value)
     form1 = '%.*g' % (precision, value)
     if not form1.find('e') == -1:
         form2 = form1.split('e')
@@ -30,12 +28,8 @@ class ArgumentError():
 
 class figure(object):
     def __init__(self, argvs):
-        if type(argvs) in (float,int,str):
-            self.value = Decimal(repr(argvs))
-            self.lowerr = 0
-            self.uperr = 0
-        elif type(argvs) is Decimal:
-            self.value = argvs
+        if isinstance(argvs, (float,int,str)):
+            self.value = float(argvs)
             self.lowerr = 0
             self.uperr = 0
         elif isinstance(argvs, (list, tuple)):
@@ -77,16 +71,6 @@ class figure(object):
             self.lowerrstr='%.*g' % (self.lowerrNSD,abs(self.lowerr))
             self.uperrstr='%.*g' % (self.uperrNSD,self.uperr)
             self.valuestr = r'%.*f' % (self.NumSigDigit-dig, self.value)
-            lerr,lowerrdig=seperate_exponent(self.lowerr,self.lowerrNSD)
-            uerr,uperrdig=seperate_exponent(self.uperr,self.uperrNSD)
-            if lowerrdig > 0:
-                lerr *= 10**lowerrdig
-                lowerrdig = 0
-                self.lowerrdig = 0
-            if uperrdig > 0:
-                uerr *= 10**uperrdig
-                uperrdig = 0
-                self.uperrdig = 0
         elif dig > 2 or dig < -3:
             self.valuestr = r'%.*f' % (self.NumSigDigit-1, self.value*10**(0-self.digit))
             self.lowerrstr='%.*g' % (self.lowerrNSD,abs(lerr*10**(lowerrdig - self.digit)))
@@ -106,15 +90,8 @@ class figure(object):
             self.lowerrstr='%.*g' % (self.lowerrNSD,abs(self.lowerr))
             self.uperrstr='%.*g' % (self.uperrNSD,self.uperr)
         #print 'value, err, str: ', self.valuestr, self.lowerrstr, self.uperrstr
-        if self.uperrdig > self.dig and not self.dig == 0:
-            self.uperrstrshort='%.0f' % (uerr * 10**(self.uperrdig - self.dig))
-        else:
-            self.uperrstrshort='%.0f' % (uerr)
-
-        if self.lowerrdig > self.dig and not self.dig == 0:
-            self.lowerrstrshort='%.0f' % ( abs(lerr * 10**(self.uperrdig - self.dig)))
-        else:
-            self.lowerrstrshort='%.0f' % ( abs(lerr))
+        self.lowerrstrshort='%.0f' % ( abs(lerr))
+        self.uperrstrshort='%.0f' % (uerr)
 
     def __repr__(self):
         return str((self.value, self.lowerr, self.uperr))
@@ -139,11 +116,8 @@ class figure(object):
             else:
                 return r'$%s$' % (FirstPart)
     def __str__(self):
-        if abs(self.lowerr) == abs(self.uperr):
-            if not self.uperrstrshort == '0':
-                FirstPart = r'%s(%s)' % (self.valuestr, self.uperrstrshort)
-            else:
-                FirstPart = r'%s' % (self.valuestr)
+        if self.lowerrstr == self.uperrstr:
+            FirstPart = r'%s(%s)' % (self.valuestr, self.uperrstrshort)
         else:
             #print self.uperr, self.lowerr
             return str(figure((self.value, (self.uperr-self.lowerr)/2)))
@@ -246,16 +220,16 @@ def shortform(value, NumSigDigit=None):
             res[key]=shortform(value[key])
         return res
     elif isinstance(value,tuple):
-        if len(value) == 3 and all([type(v) in (float, int, Decimal) for v in value]):
+        if len(value) == 3 and all([isinstance(value[i],(float, int)) for i in range(3)]):
             return str(figure(value))
-        elif len(value) == 2 and all([type(v) in (float, int, Decimal) for v in value]):
+        elif len(value) == 2 and all([isinstance(value[0],(float, int)),isinstance(value[1],(float, int))]):
             return str(figure(value))
         else:
             res=[]
             for eachone in value:
                 res.append(shortform(eachone))
             return tuple(res)
-    elif isinstance(value, (float,int,Decimal)):
+    elif isinstance(value, (float,int)):
         if NumSigDigit == None or not isinstance(NumSigDigit, int):
             form1 = '%.3g' % (value)
             if not form1.find('e') == -1:
