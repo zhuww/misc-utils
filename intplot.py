@@ -81,11 +81,11 @@ def linkAnnotationFinders(afs):
 
 def click(event):
    """If the left mouse button is pressed: draw a little square. """
-   tb = pylab.get_current_fig_manager().toolbar
+   tb = get_current_fig_manager().toolbar
    if event.button==1 and event.inaxes and tb.mode == '':
        x,y = event.xdata,event.ydata
-       pylab.plot([x],[y],'rs')
-       pylab.draw()
+       plot([x],[y],'rs')
+       draw()
 #gca().set_autoscale_on(False)
 #connect('button_press_event',click)
 

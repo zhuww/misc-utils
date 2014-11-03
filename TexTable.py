@@ -14,7 +14,7 @@ class deluxetable:
             #print '\tablenotetext{%s}{%s}' % (value, self.comments.next())
             yield value
 
-    def __init__(self, Caption='', colsetting='', colnames=[], data=[], comments=[],label='',extra='', rotate=False):
+    def __init__(self, Caption='', colsetting='', colnames=[], data=[], comments=[],label='',extra='', rotate=False, fontsize='footnotesize'):
         if colnames == []: raise InputError, 'must have column names specified!'
         if data == []: raise InputError, 'must have data provided!'
         if not len(colnames) == len(data):
@@ -29,7 +29,7 @@ class deluxetable:
         else:
             rotation = ''
 
-
+        self.fontsize = fontsize
         self.comments = iter(comments)
         self.commentslines = ''
         cols=''
@@ -71,7 +71,7 @@ class deluxetable:
 \clearpage
 \begin{deluxetable}{%(colsetting)s}
 %(rotation)s
-\tabletypesize{\footnotesize}
+\tabletypesize{\%(fontsize)s}
 \tablewidth{0pt}
 \tablecaption{\label{%(label)s} %(Caption)s }
 \tablehead{ %(colnames)s }
@@ -82,7 +82,7 @@ class deluxetable:
 %(extra)s
 \end{deluxetable}
 
-\clearpage """ % {'label':label, 'colsetting':colsetting, 'Caption':Caption, 'colnames':cols, 'data':datatable, 'comments':self.commentslines, 'extra':extra, 'rotation':rotation}
+\clearpage """ % {'label':label, 'colsetting':colsetting, 'Caption':Caption, 'colnames':cols, 'data':datatable, 'comments':self.commentslines, 'extra':extra, 'rotation':rotation, 'fontsize':self.fontsize}
         self.parsestring = self.parsestring.replace(r'@TexTableSpecialMarker@', '#')
 
 

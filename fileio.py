@@ -29,10 +29,7 @@ def readcol(file,n):
         array = infile.readlines()
         for line in array:
                 line = line.split()
-                try:
-                    res.append(double(line[n]))
-                except:
-                    res.append(str(line[n]))
+                res.append(double(line[n]))
         return numpy.array(res)
 
 if __name__ == '__main__':
